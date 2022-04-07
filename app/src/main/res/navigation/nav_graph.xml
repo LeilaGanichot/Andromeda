@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/toDoFragment">
+
+    <fragment
+        android:id="@+id/toDoFragment"
+        android:name="edu.fsu.cs.andromeda.ui.todo.ToDoFragment"
+        android:label="@string/nav_to_do"
+        tools:layout="@layout/fragment_to_do">
+        <action
+            android:id="@+id/action_toDoFragment_to_notesFragment"
+            app:destination="@id/notesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/notesFragment"
+        android:name="edu.fsu.cs.andromeda.ui.notes.NotesFragment"
+        android:label="@string/nav_notes"
+        tools:layout="@layout/fragment_notes" />
+</navigation>

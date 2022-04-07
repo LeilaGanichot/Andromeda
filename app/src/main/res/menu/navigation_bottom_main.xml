@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/toDoFragment"
+        android:icon="@drawable/ic_calendar"
+        android:title="@string/nav_to_do"/>
+
+    <item
+        android:id="@+id/notesFragment"
+        android:icon="@drawable/ic_note"
+        android:title="@string/nav_notes"/>
+
+</menu>

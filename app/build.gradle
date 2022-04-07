@@ -43,16 +43,19 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
-    implementation 'androidx.navigation:navigation-fragment:2.4.1'
-    implementation 'androidx.navigation:navigation-ui:2.4.1'
+    implementation 'androidx.navigation:navigation-fragment:2.4.2'
+    implementation 'androidx.navigation:navigation-ui:2.4.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     // Room dependencies
-    def room_version = "2.3.0"
+    def room_version = "2.4.2"
 
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
     // Toasty
     implementation 'com.github.GrenderG:Toasty:1.5.2'
+
+    // Joda Time
+    implementation 'net.danlew:android.joda:2.10.14'
 }
