@@ -1,12 +1,11 @@
 package edu.fsu.cs.andromeda.ui.todo;
 
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,11 +33,6 @@ import edu.fsu.cs.andromeda.db.todo.ToDo;
 import edu.fsu.cs.andromeda.db.todo.ToDoViewModel;
 import edu.fsu.cs.andromeda.ui.todo.calendar.CalendarAdapter;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ToDoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ToDoFragment extends Fragment {
 
     // Widgets
@@ -54,57 +48,40 @@ public class ToDoFragment extends Fragment {
     // calendar holder
     private LinearLayout llCalendarHolder;
 
+    // Quick to do view
+    private ToDoAdapter toDoAdapter;
+
     // Local vars
     private org.joda.time.LocalDate selectedDate;
     // screen's dimensions
     int sWidth;
     int sHeight;
     private ToDoViewModel toDoViewModel;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    // TODO @cm used for communication between fragments, but may be scrapped in favor of using
-    //      the Navigation library, not sure yet
-    private ToDoFragmentListener listener;
+    private MutableLiveData<String> currentCalendarDay = new MutableLiveData<>(" ");
+    private LiveData<List<ToDo>> toDosByDate;
 
     public ToDoFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ToDoFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ToDoFragment newInstance(String param1, String param2) {
-        ToDoFragment fragment = new ToDoFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
 
         toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
+//        toDoViewModel.upsertToDo(
+//                new ToDo("Complete udemy course on Kotlin",
+//                        "Access from work laptop since it requires business account.",
+//                        "2022-04-15 16:30:00",
+//                        false)
+//        );
+//        toDoViewModel.upsertToDo(
+//                new ToDo("Take Mulder to dog groomer",
+//                        "Poor guy needs a bath ASAP",
+//                        "2022-04-20 09:30:00",
+//                        false)
+//        );
+
 
         // get the device dimensions to change the display constraints dynamically
         sWidth = getContext().getResources().getDisplayMetrics().widthPixels;
@@ -117,8 +94,9 @@ public class ToDoFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_to_do, container, false);
 
+        selectedDate = LocalDate.now();
         defineWidgets(view);
-        //setCalendarViews();
+        setCalendarViews();
         setOnClickListeners();
 
         return view;
@@ -144,9 +122,10 @@ public class ToDoFragment extends Fragment {
 
         ArrayList<String> daysInMonth = daysInMonthArray(selectedDate);
         calendarAdapter = new CalendarAdapter(daysInMonth, monthFromDate(selectedDate));
+        toDoAdapter = new ToDoAdapter();
 
         if(toDoViewModel != null) {
-            toDoViewModel.getAllToDosByDueDate().observe(
+            toDoViewModel.getAllToDos().observe(
                     getViewLifecycleOwner(),
                     toDos -> calendarAdapter.setAllToDos(toDos)
             );
@@ -160,14 +139,34 @@ public class ToDoFragment extends Fragment {
             @Override
             public void onItemClick(int position, String dayText) {
                 if(!dayText.equals(" ")){
-
+                    currentCalendarDay.postValue(dayText);
                 }
             }
         });
 
         rvDayDetails.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvDayDetails.setHasFixedSize(true);
-        // rvDayDetails.setAdapter(); TODO @cm set adapter of To Dos
+        rvDayDetails.setAdapter(toDoAdapter);
+        updateToDoQuickView();
+        toDosByDate.observe(getViewLifecycleOwner(), new Observer<List<ToDo>>() {
+            @Override
+            public void onChanged(List<ToDo> toDos) {
+                toDoAdapter.setToDosByDate(toDos);
+            }
+        });
+    }
+
+    private void updateToDoQuickView() {
+        toDosByDate = Transformations.switchMap(
+                currentCalendarDay, updatedCalendarDay ->
+                        toDoViewModel.getToDosByDueDate(formatDateForDB(selectedDate, updatedCalendarDay)));
+    }
+
+    public static String formatDateForDB(org.joda.time.LocalDate date, String dayNum){
+        if(dayNum.equals(" ")) return " ";
+        org.joda.time.LocalDate moddedDate = date.withDayOfMonth(Integer.parseInt(dayNum));
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
+        return dtf.print(moddedDate);
     }
 
     private String monthYearFromDate(org.joda.time.LocalDate selectedDate) {
@@ -177,34 +176,43 @@ public class ToDoFragment extends Fragment {
 
     private ArrayList<String> daysInMonthArray(org.joda.time.LocalDate selectedDate) {
         ArrayList<String> daysInMonthArray = new ArrayList<>();
-        // TODO @cm probably should switch, Joda time is being uncooperative
+        org.joda.time.YearMonth yearMonth = new YearMonth(
+                selectedDate.getYear(),
+                selectedDate.getMonthOfYear()
+        );
+
+        int daysInMonth = yearMonth
+                .toDateTime(null)
+                .dayOfMonth()
+                .getMaximumValue();
+
+        org.joda.time.LocalDate firstOfMonth = selectedDate.withDayOfMonth(1); // get first day of the month
+        int dayOfWeek = firstOfMonth.getDayOfWeek();
+
+        for (int i = 1; i < 42; i++){
+            if(i <= dayOfWeek || i > daysInMonth + dayOfWeek){
+                daysInMonthArray.add(" "); // we add a blank
+            }else{
+                daysInMonthArray.add(String.valueOf(i - dayOfWeek));
+            }
+        }
         return daysInMonthArray;
     }
 
     private String monthFromDate(LocalDate selectedDate) {
-        return null;
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("MM");
+        return dtf.print(selectedDate); // minus because Joda time is not zero indexed
     }
 
     private void setOnClickListeners() {
-    }
+        btnPrevMonth.setOnClickListener(v -> {
+            selectedDate = selectedDate.minusMonths(1);
+            setCalendarViews();
+        });
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        try {
-            listener = (ToDoFragmentListener) context;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-    }
-
-    public interface ToDoFragmentListener {
-        // TODO @cm add interface methods as needed for fragment to parent communication if needed
+        btnNextMonth.setOnClickListener(v -> {
+            selectedDate = selectedDate.plusMonths(1);
+            setCalendarViews();
+        });
     }
 }

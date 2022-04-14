@@ -8,35 +8,36 @@
 
     <LinearLayout
         android:id="@+id/ll_calendar_holder"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
             <Button
                 android:id="@+id/btn_prev_month"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".10"
                 android:background="@drawable/ic_arrow_left_24"
-                android:textStyle="bold"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_month_year"
                 android:layout_width="0dp"
-                android:layout_weight=".80"
                 android:layout_height="wrap_content"
+                android:layout_weight=".80"
                 android:text="October 2022"
-                android:textSize="20sp"
                 android:textAlignment="center"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/btn_next_month"
@@ -44,8 +45,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".10"
                 android:background="@drawable/ic_arrow_right_24"
-                android:textStyle="bold"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -60,7 +61,7 @@
                 android:layout_weight="1"
                 android:text="SUN"
                 android:textAlignment="center"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="0dp"
@@ -68,7 +69,7 @@
                 android:layout_weight="1"
                 android:text="MON"
                 android:textAlignment="center"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="0dp"
@@ -76,7 +77,7 @@
                 android:layout_weight="1"
                 android:text="TUE"
                 android:textAlignment="center"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="0dp"
@@ -84,7 +85,7 @@
                 android:layout_weight="1"
                 android:text="WED"
                 android:textAlignment="center"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="0dp"
@@ -92,7 +93,7 @@
                 android:layout_weight="1"
                 android:text="THU"
                 android:textAlignment="center"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="0dp"
@@ -100,7 +101,7 @@
                 android:layout_weight="1"
                 android:text="FRI"
                 android:textAlignment="center"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="0dp"
@@ -108,7 +109,7 @@
                 android:layout_weight="1"
                 android:text="SAT"
                 android:textAlignment="center"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
 
         </LinearLayout>
@@ -116,16 +117,20 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_calendar"
             android:layout_width="match_parent"
-            android:layout_height="250dp"/>
+            android:layout_height="250dp" />
 
     </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_day_details"
         android:layout_width="match_parent"
+        android:elevation="20dp"
         android:layout_height="250dp"
+        android:layout_marginTop="12dp"
         android:layout_marginBottom="55dp"
+        android:padding="6dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_new_to_do"

@@ -47,11 +47,24 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     private void setDueDateIndicator(CalendarViewHolder holder, int position) {
         for (ToDo toDo: allToDos) {
             if(toDo.getDueDate() != null){
-                // TODO figure out the below for API < 26
-//                if(extractDayFromDate(toDo.getDueDate()).equals(daysOfMonth.get(position))){
-//                    holder.tvDueDateIndicator.setVisibility(View.VISIBLE);
-//                }
+                if(extractDayFromDate(toDo.getDueDate()).equals(daysOfMonth.get(position))){
+                    holder.tvDueDateIndicator.setVisibility(View.VISIBLE);
+                }
             }
+        }
+    }
+
+    private String extractDayFromDate(String dateTimeString){
+        if (!dateTimeString.isEmpty()) {
+            String dateString = dateTimeString.split(" ")[0];
+            String monthFromSplit = dateString.split("-")[1]; // string array after splits looks like: [year, month, day]
+            if(monthFromSplit.equals(month)) {
+                return String.valueOf(Integer.parseInt(dateString.split("-")[2]));
+            } else {
+                return "";
+            }
+        }else{
+            return "";
         }
     }
 

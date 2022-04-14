@@ -20,8 +20,9 @@ public class ToDoRepository {
 
     private ToDoDao toDoDao;
 
-    private LiveData<List<ToDo>> allToDosByDueDate;
+    private LiveData<List<ToDo>> allToDos;
     private LiveData<List<ToDo>> searchToDoResults;
+    private LiveData<List<ToDo>> toDosByDueDate;
 
     /**
      * A constructor that will instantiate a repo object.
@@ -33,7 +34,7 @@ public class ToDoRepository {
         toDoDao = andromedaDB.toDoDao();
 
         // LiveData objects
-        allToDosByDueDate = toDoDao.getAllToDosByDueDate();
+        allToDos = toDoDao.getAllToDos();
     }
 
     // Database operations
@@ -50,13 +51,18 @@ public class ToDoRepository {
         new DeleteToDoAsync(toDoDao).execute(toDo);
     }
 
-    public LiveData<List<ToDo>> getAllToDosByDueDate() {
-        return allToDosByDueDate;
+    public LiveData<List<ToDo>> getAllToDos() {
+        return allToDos;
     }
 
     public LiveData<List<ToDo>> getSearchToDoResults(String searchQuery) {
         searchToDoResults = toDoDao.searchToDo(searchQuery);
         return searchToDoResults;
+    }
+
+    public LiveData<List<ToDo>> getToDosByDueDate(String dueDate) {
+        toDosByDueDate = toDoDao.getToDosByDueDate(dueDate);
+        return toDosByDueDate;
     }
 
     // Async task operations

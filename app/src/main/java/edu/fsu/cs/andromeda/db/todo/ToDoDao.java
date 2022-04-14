@@ -24,11 +24,14 @@ public interface ToDoDao {
     void deleteToDo(ToDo toDo);
 
     @Query("SELECT * FROM tableToDo ORDER BY dueDate DESC")
-    LiveData<List<ToDo>> getAllToDosByDueDate();
+    LiveData<List<ToDo>> getAllToDos();
 
     @Query("SELECT * FROM tableToDo " +
             "WHERE title LIKE '%' || :searchQuery || '%' " +
             "OR body LIKE '%' || :searchQuery || '%' " +
             "ORDER BY dueDate DESC")
     LiveData<List<ToDo>> searchToDo(String searchQuery);
+
+    @Query("SELECT * FROM tableToDo WHERE dueDate LIKE :dueDate || '%'")
+    LiveData<List<ToDo>> getToDosByDueDate(String dueDate);
 }
