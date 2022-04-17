@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:padding="8dp"
-    app:cardBackgroundColor="#00000000"
+    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="10dp"
     app:cardElevation="2dp"
     android:layout_marginBottom="8dp">
@@ -42,7 +42,7 @@
                 android:ellipsize="end"
                 android:textColor="@color/black"
                 android:textSize="14sp"
-                android:layout_weight=".5"/>
+                android:layout_weight=".45"/>
 
             <TextView
                 android:id="@+id/tv_to_do_due_date"
@@ -50,8 +50,10 @@
                 android:layout_height="wrap_content"
                 tools:text="Apr 20 2020 - 06:00:00PM"
                 android:textSize="14sp"
-                android:textAlignment="center"
-                android:layout_weight=".5"/>
+                android:textAlignment="viewEnd"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_weight=".55"/>
 
         </LinearLayout>
 
