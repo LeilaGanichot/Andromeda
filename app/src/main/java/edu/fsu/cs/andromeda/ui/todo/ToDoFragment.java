@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonth;
 import org.joda.time.format.DateTimeFormat;
@@ -71,15 +72,33 @@ public class ToDoFragment extends Fragment {
 
         toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
 //        toDoViewModel.upsertToDo(
-//                new ToDo("Complete udemy course on Kotlin",
-//                        "Access from work laptop since it requires business account.",
-//                        "2022-04-15 16:30:00",
+//                new ToDo("Pick up mulch for flower bed",
+//                        "",
+//                        "2022-05-01 17:30:00",
 //                        false)
 //        );
 //        toDoViewModel.upsertToDo(
-//                new ToDo("Take Mulder to dog groomer",
-//                        "Poor guy needs a bath ASAP",
-//                        "2022-04-20 09:30:00",
+//                new ToDo("Stop by nursery for extra hydrangeas",
+//                        "",
+//                        "2022-05-01 18:00:00",
+//                        false)
+//        );
+//        toDoViewModel.upsertToDo(
+//                new ToDo("Call about referrals",
+//                        "",
+//                        "2022-05-01 09:30:00",
+//                        false)
+//        );
+//        toDoViewModel.upsertToDo(
+//                new ToDo("Update playlist",
+//                        "I have the best taste in music",
+//                        "2022-05-31 12:30:00",
+//                        false)
+//        );
+//        toDoViewModel.upsertToDo(
+//                new ToDo("Pick up birthday cake",
+//                        "Don't forget the party hats",
+//                        "2022-05-27 09:45:00",
 //                        false)
 //        );
     }
@@ -176,9 +195,20 @@ public class ToDoFragment extends Fragment {
 
     public static String formatDateForDB(org.joda.time.LocalDate date, String dayNum){
         if(dayNum.equals(" ")) return " ";
-        org.joda.time.LocalDate moddedDate = date.withDayOfMonth(Integer.parseInt(dayNum));
+        LocalDate moddedDate = null;
+        /*
+            If the user taps on calendar cell 31, on a month that has 31 days, but then switches
+            to another month that only has 30 days, this try/catch prevents Joda time from
+            attempting to convert this into a valid LocalDate, since a date such as 04-31-2022
+            does not exist.
+         */
+        try {
+            moddedDate = date.withDayOfMonth(Integer.parseInt(dayNum));
+        } catch (IllegalFieldValueException e) {
+            e.printStackTrace();
+        }
         DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
-        return dtf.print(moddedDate);
+        return (moddedDate != null)? dtf.print(moddedDate) : " ";
     }
 
     private String monthYearFromDate(org.joda.time.LocalDate selectedDate) {
