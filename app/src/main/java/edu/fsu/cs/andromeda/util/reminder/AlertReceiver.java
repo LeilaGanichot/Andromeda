@@ -16,7 +16,7 @@ import edu.fsu.cs.andromeda.ui.todo.ToDoFragment;
 public class AlertReceiver extends BroadcastReceiver {
     private NotificationManagerCompat notificationManagerCompat;
     public static final String CHANNEL_REMINDER_REG =
-            "com.pinkmoon.flux.DashboardFragment.CHANNEL_REMINDER_REG";
+            "edu.fsu.cs.andromeda.util.reminder.CHANNEL_REMINDER_REG";
     @Override
     public void onReceive(Context context, Intent intent) {
         String reminderTitle = intent.getStringExtra(ReminderHelper.EXTRA_REMINDER_TITLE);

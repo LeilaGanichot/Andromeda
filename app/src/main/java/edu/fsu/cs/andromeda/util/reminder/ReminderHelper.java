@@ -13,12 +13,12 @@ import androidx.annotation.RequiresApi;
 public class ReminderHelper {
 
     //INTENT EXTRAS, Alarm stuff.
-    public static final String EXTRA_REMINDER_TITLE = "com.pinkmoon.flux.ui.notifications.EXTRA_REMINDER_TITLE";
-    public static final String EXTRA_REMINDER_BODY = "com.pinkmoon.flux.ui.notifications.EXTRA_REMINDER_BODY";
-    public static final String EXTRA_REMINDER_ID =   "com.pinkmoon.flux.ui.notifications.EXTRA_REMINDER_ID";
-    public static final String EXTRA_REMINDER_DATE = "com.pinkmoon.flux.ui.notifications.EXTRA_REMINDER_DATE";
-    public static final String EXTRA_REMINDER_TIME = "com.pinkmoon.flux.ui.notifications.EXTRA_REMINDER_TIME";
-    public static final String EXTRA_REMINDER_STATUS = "com.pinkmoon.flux.ui.notifications.EXTRA_REMINDER_STATUS";
+    public static final String EXTRA_REMINDER_TITLE = "edu.fsu.cs.andromeda.util.reminder.EXTRA_REMINDER_TITLE";
+    public static final String EXTRA_REMINDER_BODY = "edu.fsu.cs.andromeda.util.reminder.EXTRA_REMINDER_BODY";
+    public static final String EXTRA_REMINDER_ID =   "edu.fsu.cs.andromeda.util.reminder.EXTRA_REMINDER_ID";
+    public static final String EXTRA_REMINDER_DATE = "edu.fsu.cs.andromeda.util.reminder.EXTRA_REMINDER_DATE";
+    public static final String EXTRA_REMINDER_TIME = "edu.fsu.cs.andromeda.util.reminder.EXTRA_REMINDER_TIME";
+    public static final String EXTRA_REMINDER_STATUS = "edu.fsu.cs.andromeda.util.reminder.EXTRA_REMINDER_STATUS";
 
     // Alarm stuff
     private static AlarmManager alarmManager;

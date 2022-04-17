@@ -7,7 +7,7 @@ import android.app.NotificationManager;
 import android.os.Build;
 
 public class AndromedaApp extends Application {
-    public static final String CHANNEL_1_ID = "com.pinkmoon.flux.ui.notifications.channel1";
+    public static final String CHANNEL_1_ID = "edu.fsu.cs.andromeda.channel1";
     public static final String CHANNEL_2_ID = "channel2";
 
     @Override
