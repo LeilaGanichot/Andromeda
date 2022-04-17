@@ -1,71 +1,39 @@
 package edu.fsu.cs.andromeda.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import java.util.List;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import edu.fsu.cs.andromeda.R;
-import edu.fsu.cs.andromeda.db.todo.ToDo;
-import edu.fsu.cs.andromeda.db.todo.ToDoViewModel;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    // TODO @cm test stuff; remove {
-    private EditText etSearch;
-    private TextView tvDisplayResults;
-    private Button btnSearch;
-
-    private ToDoViewModel toDoViewModel;
-
-    private LiveData<List<ToDo>> searchToDosResults;
-    private MutableLiveData<String> searchQueryText = new MutableLiveData<>("");
-    // TODO @cm test stuff; remove }
+    NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TODO @cm test stuff; remove {
-        etSearch = findViewById(R.id.et_search);
-        tvDisplayResults = findViewById(R.id.tv_display_results);
-        btnSearch = findViewById(R.id.btn_positive);
+        BottomNavigationView navView = findViewById(R.id.nav_bottom_main);
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.toDoFragment,
+                R.id.notesFragment
+        ).build();
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
+    }
 
-        toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
-        toDoViewModel.upsertToDo(
-                new ToDo("Complete udemy course on Kotlin",
-                        "Access from work laptop since it requires business account.",
-                        "2022-04-15 16:30:00",
-                        false)
-        );
-        toDoViewModel.upsertToDo(
-                new ToDo("Take Mulder to dog groomer",
-                        "",
-                        "2022-04-05 09:30:00",
-                        false)
-        );
-
-        searchToDosResults = Transformations.switchMap(searchQueryText,
-                updatedSearchQueryText -> toDoViewModel.getSearchToDosResults(updatedSearchQueryText));
-        searchToDosResults.observe(this, toDos -> {
-            String results = "";
-            for (int i = 0; i < toDos.size(); i++) {
-                results += toDos.get(i).toString() + "\n";
-            }
-            tvDisplayResults.setText(results);
-        });
-
-        btnSearch.setOnClickListener(v -> searchQueryText.postValue(etSearch.getText().toString()));
-        // TODO @cm test stuff, remove }
+    @Override
+    public boolean onSupportNavigateUp() {
+        return navController.navigateUp() || super.onSupportNavigateUp();
     }
 }

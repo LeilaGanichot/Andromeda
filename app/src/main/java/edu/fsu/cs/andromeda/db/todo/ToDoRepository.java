@@ -1,6 +1,7 @@
 package edu.fsu.cs.andromeda.db.todo;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
@@ -20,8 +21,9 @@ public class ToDoRepository {
 
     private ToDoDao toDoDao;
 
-    private LiveData<List<ToDo>> allToDosByDueDate;
+    private LiveData<List<ToDo>> allToDos;
     private LiveData<List<ToDo>> searchToDoResults;
+    private LiveData<List<ToDo>> toDosByDueDate;
 
     /**
      * A constructor that will instantiate a repo object.
@@ -33,7 +35,12 @@ public class ToDoRepository {
         toDoDao = andromedaDB.toDoDao();
 
         // LiveData objects
-        allToDosByDueDate = toDoDao.getAllToDosByDueDate();
+        allToDos = toDoDao.getAllToDos();
+    }
+
+    public ToDoRepository(Context context) {
+        AndromedaDB andromedaDB = AndromedaDB.getInstance(context);
+        toDoDao = andromedaDB.toDoDao();
     }
 
     // Database operations
@@ -46,17 +53,27 @@ public class ToDoRepository {
         return 0;
     }
 
+    // only called from the NotificationInteractionReceiverClass
+    public void markToDoAsComplete(int toDoId) {
+        new MarkToDoAsCompleteAsync(toDoDao).execute(toDoId);
+    }
+
     public void deleteToDo(ToDo toDo) {
         new DeleteToDoAsync(toDoDao).execute(toDo);
     }
 
-    public LiveData<List<ToDo>> getAllToDosByDueDate() {
-        return allToDosByDueDate;
+    public LiveData<List<ToDo>> getAllToDos() {
+        return allToDos;
     }
 
     public LiveData<List<ToDo>> getSearchToDoResults(String searchQuery) {
         searchToDoResults = toDoDao.searchToDo(searchQuery);
         return searchToDoResults;
+    }
+
+    public LiveData<List<ToDo>> getToDosByDueDate(String dueDate) {
+        toDosByDueDate = toDoDao.getToDosByDueDate(dueDate);
+        return toDosByDueDate;
     }
 
     // Async task operations
@@ -87,6 +104,21 @@ public class ToDoRepository {
         @Override
         protected Long doInBackground(ToDo... toDos) {
             toDoDao.deleteToDo(toDos[0]);
+            return null;
+        }
+    }
+
+    public class MarkToDoAsCompleteAsync extends AsyncTask<Integer, Void, Void> {
+
+        ToDoDao toDoDao;
+
+        public MarkToDoAsCompleteAsync(ToDoDao toDoDao) {
+            this.toDoDao = toDoDao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... ids) {
+            toDoDao.markToDoAsComplete(ids[0]);
             return null;
         }
     }
