@@ -40,6 +40,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
         if(currentToDo.getBody().isEmpty()) {
             holder.tvToDoBody.setVisibility(View.GONE);
         } else {
+            holder.tvToDoBody.setVisibility(View.VISIBLE);
             holder.tvToDoBody.setText(currentToDo.getBody());
         }
         holder.tvToDoDueDate.setText(formatDatePretty(currentToDo.getDueDate()));
@@ -86,8 +87,8 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
                 @Override
                 public void onClick(View view) {
                     int position = getAdapterPosition();
-                    if(position != RecyclerView.NO_POSITION) {
-                        listener.onItemClick(toDosByDate.get(position));
+                    if(position != RecyclerView.NO_POSITION && listener != null) {
+                        listener.onItemClick(toDosByDate.get(position), view);
                     }
                 }
             });
@@ -99,7 +100,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
     }
 
     public interface OnItemClickListener {
-        void onItemClick(ToDo toDo);
+        void onItemClick(ToDo toDo, View view);
     }
 }
 

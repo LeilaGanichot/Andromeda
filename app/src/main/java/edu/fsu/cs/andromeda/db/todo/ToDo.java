@@ -1,14 +1,19 @@
 package edu.fsu.cs.andromeda.db.todo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import java.io.Serializable;
 
 /**
  * A representation of a To Do as a POJO (plain old Java object).
  */
 @Entity(tableName = "tableToDo")
-public class ToDo {
+public class ToDo implements Parcelable, Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private int toDoId;
@@ -42,6 +47,26 @@ public class ToDo {
         this.dueDate = dueDate;
         this.complete = complete;
     }
+
+    protected ToDo(Parcel in) {
+        toDoId = in.readInt();
+        title = in.readString();
+        body = in.readString();
+        dueDate = in.readString();
+        complete = in.readByte() != 0;
+    }
+
+    public static final Creator<ToDo> CREATOR = new Creator<ToDo>() {
+        @Override
+        public ToDo createFromParcel(Parcel in) {
+            return new ToDo(in);
+        }
+
+        @Override
+        public ToDo[] newArray(int size) {
+            return new ToDo[size];
+        }
+    };
 
     public int getToDoId() {
         return toDoId;
@@ -87,5 +112,19 @@ public class ToDo {
     @Override
     public String toString() {
         return "Title: " + title + "\n" + "Body:" + body;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(toDoId);
+        dest.writeString(title);
+        dest.writeString(body);
+        dest.writeString(dueDate);
+        dest.writeByte((byte) (complete ? 1 : 0));
     }
 }

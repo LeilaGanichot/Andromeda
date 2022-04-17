@@ -34,4 +34,7 @@ public interface ToDoDao {
 
     @Query("SELECT * FROM tableToDo WHERE dueDate LIKE :dueDate || '%'")
     LiveData<List<ToDo>> getToDosByDueDate(String dueDate);
+
+    @Query("UPDATE tableToDo SET complete = 1 WHERE toDoId = :toDoId")
+    void markToDoAsComplete(int toDoId);
 }

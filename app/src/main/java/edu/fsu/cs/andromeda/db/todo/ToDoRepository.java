@@ -1,6 +1,7 @@
 package edu.fsu.cs.andromeda.db.todo;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
@@ -37,6 +38,11 @@ public class ToDoRepository {
         allToDos = toDoDao.getAllToDos();
     }
 
+    public ToDoRepository(Context context) {
+        AndromedaDB andromedaDB = AndromedaDB.getInstance(context);
+        toDoDao = andromedaDB.toDoDao();
+    }
+
     // Database operations
     public long upsertToDo(ToDo toDo) {
         try{
@@ -45,6 +51,11 @@ public class ToDoRepository {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    // only called from the NotificationInteractionReceiverClass
+    public void markToDoAsComplete(int toDoId) {
+        new MarkToDoAsCompleteAsync(toDoDao).execute(toDoId);
     }
 
     public void deleteToDo(ToDo toDo) {
@@ -93,6 +104,21 @@ public class ToDoRepository {
         @Override
         protected Long doInBackground(ToDo... toDos) {
             toDoDao.deleteToDo(toDos[0]);
+            return null;
+        }
+    }
+
+    public class MarkToDoAsCompleteAsync extends AsyncTask<Integer, Void, Void> {
+
+        ToDoDao toDoDao;
+
+        public MarkToDoAsCompleteAsync(ToDoDao toDoDao) {
+            this.toDoDao = toDoDao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... ids) {
+            toDoDao.markToDoAsComplete(ids[0]);
             return null;
         }
     }

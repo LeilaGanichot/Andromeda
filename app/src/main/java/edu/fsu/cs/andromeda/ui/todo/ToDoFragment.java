@@ -1,12 +1,15 @@
 package edu.fsu.cs.andromeda.ui.todo;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,8 +57,6 @@ public class ToDoFragment extends Fragment {
     // Local vars
     private org.joda.time.LocalDate selectedDate;
     // screen's dimensions
-    int sWidth;
-    int sHeight;
     private ToDoViewModel toDoViewModel;
     private MutableLiveData<String> currentCalendarDay = new MutableLiveData<>(" ");
     private LiveData<List<ToDo>> toDosByDate;
@@ -81,11 +82,6 @@ public class ToDoFragment extends Fragment {
 //                        "2022-04-20 09:30:00",
 //                        false)
 //        );
-
-
-        // get the device dimensions to change the display constraints dynamically
-        sWidth = getContext().getResources().getDisplayMetrics().widthPixels;
-        sHeight = getContext().getResources().getDisplayMetrics().heightPixels;
     }
 
     @Override
@@ -111,8 +107,6 @@ public class ToDoFragment extends Fragment {
         btnNextMonth = view.findViewById(R.id.btn_next_month);
 
         llCalendarHolder = view.findViewById(R.id.ll_calendar_holder);
-        llCalendarHolder.setLayoutParams(new LinearLayout.LayoutParams(sWidth, sHeight));
-
         fabAddNewToDo = view.findViewById(R.id.fab_add_new_to_do);
     }
 
@@ -147,6 +141,24 @@ public class ToDoFragment extends Fragment {
         rvDayDetails.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvDayDetails.setHasFixedSize(true);
         rvDayDetails.setAdapter(toDoAdapter);
+        toDoAdapter.setOnItemClickListener((toDo, view) -> {
+            ToDoFragmentDirections.ActionToDoFragmentToAddEditToDoFragment action =
+                    ToDoFragmentDirections.actionToDoFragmentToAddEditToDoFragment(toDo);
+            Navigation.findNavController(view).navigate(action);
+        });
+        // just a simple animation to hide the FAB when the user scrolls down the RV,
+        // and restore it when they scroll to top
+        rvDayDetails.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy > 0) {
+                    fabAddNewToDo.hide();
+                } else if (dy < 0) {
+                    fabAddNewToDo.show();
+                }
+            }
+        });
         updateToDoQuickView();
         toDosByDate.observe(getViewLifecycleOwner(), new Observer<List<ToDo>>() {
             @Override
@@ -213,6 +225,12 @@ public class ToDoFragment extends Fragment {
         btnNextMonth.setOnClickListener(v -> {
             selectedDate = selectedDate.plusMonths(1);
             setCalendarViews();
+        });
+
+        fabAddNewToDo.setOnClickListener(v -> {
+            ToDoFragmentDirections.ActionToDoFragmentToAddEditToDoFragment action =
+                    ToDoFragmentDirections.actionToDoFragmentToAddEditToDoFragment(null);
+            Navigation.findNavController(v).navigate(action);
         });
     }
 }

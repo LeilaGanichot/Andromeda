@@ -13,10 +13,26 @@
         <action
             android:id="@+id/action_toDoFragment_to_notesFragment"
             app:destination="@id/notesFragment" />
+        <action
+            android:id="@+id/action_toDoFragment_to_addEditToDoFragment"
+            app:destination="@id/addEditToDoFragment" />
     </fragment>
     <fragment
         android:id="@+id/notesFragment"
         android:name="edu.fsu.cs.andromeda.ui.notes.NotesFragment"
         android:label="@string/nav_notes"
         tools:layout="@layout/fragment_notes" />
+    <fragment
+        android:id="@+id/addEditToDoFragment"
+        android:name="edu.fsu.cs.andromeda.ui.todo.AddEditToDoFragment"
+        android:label="New To Do"
+        tools:layout="@layout/fragment_add_edit_to_do" >
+        <argument
+            android:name="editToDo"
+            app:argType="edu.fsu.cs.andromeda.db.todo.ToDo"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_addEditToDoFragment_to_toDoFragment"
+            app:destination="@id/toDoFragment" />
+    </fragment>
 </navigation>
