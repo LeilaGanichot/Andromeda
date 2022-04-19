@@ -1,5 +1,6 @@
 package edu.fsu.cs.andromeda.ui.todo;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,9 +19,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.timepicker.MaterialTimePicker;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import edu.fsu.cs.andromeda.R;
 import edu.fsu.cs.andromeda.db.todo.ToDo;
@@ -37,6 +44,9 @@ public class AddEditToDoFragment extends Fragment {
     public static final int TEN_MIN_AS_MS = 600000;
     public static final int ONE_HOUR_IN_MS = 3600000;
     public static final int ONE_DAY_IN_MS = 86400000;
+
+    private String selectedDateTime = "";
+
 
     // widgets
     private View view; // global for nav components
@@ -122,6 +132,7 @@ public class AddEditToDoFragment extends Fragment {
         //  toggle the visibility of the btnCustomReminderTime, so show or hide from the user
         btnSetToDoDueDate.setOnClickListener(v -> { // the to do's official due date
             // TODO @cm add a material date time picker & grab the datetime as a String of format "YYYY-MM-dd HH:mm:ss"
+            callDatePickerDialog();
         });
 
         btnCustomReminderTime.setOnClickListener(v -> {
@@ -172,6 +183,60 @@ public class AddEditToDoFragment extends Fragment {
                 currentToDo.getBody(),
                 currentToDo.getToDoId()
         );
+    }
+
+    private void callDatePickerDialog(){
+        MaterialDatePicker.Builder<Long> materialDateBuilder = MaterialDatePicker.Builder.datePicker();
+        MaterialDatePicker<Long> mdp = materialDateBuilder.build();
+        mdp.show(getChildFragmentManager(),"Material date picker from AddEditTaskFragment.java");
+        mdp.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+            @Override
+            public void onPositiveButtonClick(Object selection) {
+                callTimePickerDialog(mdp.getHeaderText());
+            }
+        });
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void callTimePickerDialog(String selectedDate){
+        MaterialTimePicker mtp = new MaterialTimePicker.Builder()
+                .build();
+
+        mtp.show(getChildFragmentManager(), "Material time picker from AddEditToDoFragment.java");
+        mtp.addOnPositiveButtonClickListener(v -> {
+            String hour = (isSingleDigitTime(String.valueOf(mtp.getHour()))) ?
+                    singleDigitToDouble(mtp.getHour()) : String.valueOf(mtp.getHour());
+            String minute = (isSingleDigitTime(String.valueOf(mtp.getMinute()))) ?
+                    singleDigitToDouble(mtp.getMinute()) : String.valueOf(mtp.getMinute());
+
+            // sets the date to be attached to the Task
+            selectedDateTime = formatDateTimeFromMDPToDBFormat(
+                            selectedDate + " " + hour + ":" + minute + ":00"
+                    );
+            btnSetToDoDueDate.setText("Due on: " + selectedDate + " " + hour + ":" + minute + ":00");
+        });
+    }
+
+    private boolean isSingleDigitTime(String time){
+        return time.length() <= 1;
+    }
+
+    private String singleDigitToDouble(int singleDigitTime){
+        return "0" + singleDigitTime;
+    }
+
+    private String formatDateTimeFromMDPToDBFormat(String dateTimeString){
+        @SuppressLint("SimpleDateFormat") DateFormat parser = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss");
+        Date date = null;
+        try {
+            date = (Date) parser.parse(dateTimeString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        @SuppressLint("SimpleDateFormat") DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        assert date != null;
+        return formatter.format(date);
     }
 
     private Calendar convertToDateTime(String dateTime) {

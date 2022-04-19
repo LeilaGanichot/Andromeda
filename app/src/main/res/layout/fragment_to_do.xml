@@ -10,14 +10,14 @@
         android:id="@+id/cl_calendar_holder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight=".60"
+        app:layout_constraintBottom_toTopOf="@id/cl_quick_view_holder"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/cl_quick_view_holder">
+        app:layout_constraintVertical_weight=".60">
 
         <LinearLayout
             android:id="@+id/ll_calendar_holder"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -126,8 +126,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_calendar"
                 android:layout_width="match_parent"
-                android:layout_height="250dp" />
-
+                android:layout_height="match_parent" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
