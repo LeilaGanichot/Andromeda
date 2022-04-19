@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -49,8 +50,6 @@ public class ToDoFragment extends Fragment {
     // top calendar controls
     private CalendarAdapter calendarAdapter;
     private Button btnPrevMonth, btnNextMonth;
-    // calendar holder
-    private LinearLayout llCalendarHolder;
 
     // Quick to do view
     private ToDoAdapter toDoAdapter;
@@ -125,7 +124,6 @@ public class ToDoFragment extends Fragment {
         btnPrevMonth = view.findViewById(R.id.btn_prev_month);
         btnNextMonth = view.findViewById(R.id.btn_next_month);
 
-        llCalendarHolder = view.findViewById(R.id.ll_calendar_holder);
         fabAddNewToDo = view.findViewById(R.id.fab_add_new_to_do);
     }
 
