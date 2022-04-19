@@ -3,12 +3,21 @@ package edu.fsu.cs.andromeda.ui.notes;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+
 import edu.fsu.cs.andromeda.R;
+import edu.fsu.cs.andromeda.db.note.NoteViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -22,6 +31,16 @@ public class NotesFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    //Add new note
+    private FloatingActionButton fabAddNewNote;
+
+    private NotesRecyclerViewAdapter adapter;
+
+    private NotesRecyclerViewAdapter notesAdapter;
+
+    private NoteViewModel noteViewModel;
+
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -29,6 +48,7 @@ public class NotesFragment extends Fragment {
     public NotesFragment() {
         // Required empty public constructor
     }
+
 
     /**
      * Use this factory method to create a new instance of
@@ -55,12 +75,43 @@ public class NotesFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        noteViewModel = new ViewModelProvider(this).get(NoteViewModel.class);
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notes, container, false);
+        View view = inflater.inflate(R.layout.fragment_notes, container, false);
+
+        setOnClickListeners();
+        fabAddNewNote = view.findViewById(R.id.fab_add_new_note);
+
+        ArrayList<String> noteItems = new ArrayList<>();
+        noteItems.add("Note 1");
+        noteItems.add("Note 2");
+
+        RecyclerView rView = view.findViewById(R.id.notesRV);
+        rView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        adapter = new NotesRecyclerViewAdapter(getActivity(), noteItems);
+
+        rView.setAdapter(adapter);
+
+        return view;
+
     }
+    private void setOnClickListeners()
+    {
+      /*
+        fabAddNewNote.setOnClickListener(v -> {
+            NotesFragmentDirections.ActionNotesFragmentToAddEditNoteFragment action =
+                    NotesFragmentDirections.actionNotesFragmentToAddEditNoteFragment(null);
+            Navigation.findNavController(v).navigate(action);
+        });*/
+    }
+
+
 }
