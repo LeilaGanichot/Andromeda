@@ -21,7 +21,11 @@
         android:id="@+id/notesFragment"
         android:name="edu.fsu.cs.andromeda.ui.notes.NotesFragment"
         android:label="@string/nav_notes"
-        tools:layout="@layout/fragment_notes" />
+        tools:layout="@layout/fragment_notes" >
+        <action
+            android:id="@+id/action_notesFragment_to_addEditNoteFragment"
+            app:destination="@+id/addEditNoteFragment"/>
+    </fragment>
     <fragment
         android:id="@+id/addEditToDoFragment"
         android:name="edu.fsu.cs.andromeda.ui.todo.AddEditToDoFragment"
@@ -34,5 +38,12 @@
         <action
             android:id="@+id/action_addEditToDoFragment_to_toDoFragment"
             app:destination="@id/toDoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditNoteFragment"
+        android:name="edu.fsu.cs.andromeda.ui.notes.AddEditNoteFragment"
+        android:label="New Note"
+        tools:layout="@layout/new_note">
     </fragment>
 </navigation>
