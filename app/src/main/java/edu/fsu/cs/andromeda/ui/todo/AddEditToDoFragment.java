@@ -33,6 +33,7 @@ import java.util.Date;
 import edu.fsu.cs.andromeda.R;
 import edu.fsu.cs.andromeda.db.todo.ToDo;
 import edu.fsu.cs.andromeda.db.todo.ToDoViewModel;
+import edu.fsu.cs.andromeda.util.AndromedaDate;
 import edu.fsu.cs.andromeda.util.reminder.ReminderHelper;
 
 public class AddEditToDoFragment extends Fragment {
@@ -164,7 +165,7 @@ public class AddEditToDoFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void createReminder() {
-        long dueDateInMs = convertToDateTime(currentToDo.getDueDate()).getTimeInMillis();
+        long dueDateInMs = AndromedaDate.convertToDateTime(currentToDo.getDueDate()).getTimeInMillis();
         ReminderHelper reminderHelper = ReminderHelper.getInstance(getActivity());
 
         // automatic, mandatory reminder on due date
@@ -210,7 +211,7 @@ public class AddEditToDoFragment extends Fragment {
                     singleDigitToDouble(mtp.getMinute()) : String.valueOf(mtp.getMinute());
 
             // sets the date to be attached to the Task
-            selectedDateTime = formatDateTimeFromMDPToDBFormat(
+            selectedDateTime = AndromedaDate.formatDateTimeFromMDPToDBFormat(
                             selectedDate + " " + hour + ":" + minute + ":00"
                     );
             btnSetToDoDueDate.setText("Due on: " + selectedDate + " " + hour + ":" + minute + ":00");
@@ -223,38 +224,5 @@ public class AddEditToDoFragment extends Fragment {
 
     private String singleDigitToDouble(int singleDigitTime){
         return "0" + singleDigitTime;
-    }
-
-    private String formatDateTimeFromMDPToDBFormat(String dateTimeString){
-        @SuppressLint("SimpleDateFormat") DateFormat parser = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss");
-        Date date = null;
-        try {
-            date = (Date) parser.parse(dateTimeString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        @SuppressLint("SimpleDateFormat") DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        assert date != null;
-        return formatter.format(date);
-    }
-
-    private Calendar convertToDateTime(String dateTime) {
-        Calendar convertedDateTime = Calendar.getInstance();
-
-        String[] dateTimeSplit = dateTime.split(" ");
-
-        String[] dateSplit = dateTimeSplit[0].split("-");
-        String[] timeSplit = dateTimeSplit[1].split(":");
-
-        convertedDateTime.set(Calendar.MONTH, Integer.parseInt(dateSplit[1]) - 1); // -1 because months are 0th indexed
-        convertedDateTime.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dateSplit[2]));
-        convertedDateTime.set(Calendar.YEAR, Integer.parseInt(dateSplit[0]));
-
-        convertedDateTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeSplit[0]));
-        convertedDateTime.set(Calendar.MINUTE, Integer.parseInt(timeSplit[1]));
-        convertedDateTime.set(Calendar.SECOND, 0);
-
-        return convertedDateTime;
     }
 }

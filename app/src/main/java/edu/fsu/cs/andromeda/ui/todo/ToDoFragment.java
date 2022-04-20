@@ -1,7 +1,6 @@
 package edu.fsu.cs.andromeda.ui.todo;
 
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
@@ -13,30 +12,20 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
-import org.joda.time.YearMonth;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import edu.fsu.cs.andromeda.R;
 import edu.fsu.cs.andromeda.db.todo.ToDo;
 import edu.fsu.cs.andromeda.db.todo.ToDoViewModel;
 import edu.fsu.cs.andromeda.ui.todo.calendar.CalendarAdapter;
+import edu.fsu.cs.andromeda.util.AndromedaDate;
 
 public class ToDoFragment extends Fragment {
 
@@ -129,10 +118,10 @@ public class ToDoFragment extends Fragment {
 
     private void setCalendarViews() {
         // month view
-        monthYearText.setText(monthYearFromDate(selectedDate));
+        monthYearText.setText(AndromedaDate.monthYearFromDate(selectedDate));
 
-        ArrayList<String> daysInMonth = daysInMonthArray(selectedDate);
-        calendarAdapter = new CalendarAdapter(daysInMonth, monthFromDate(selectedDate));
+        ArrayList<String> daysInMonth = AndromedaDate.daysInMonthArray(selectedDate);
+        calendarAdapter = new CalendarAdapter(daysInMonth, AndromedaDate.monthFromDate(selectedDate));
         toDoAdapter = new ToDoAdapter();
 
         if(toDoViewModel != null) {
@@ -188,60 +177,7 @@ public class ToDoFragment extends Fragment {
     private void updateToDoQuickView() {
         toDosByDate = Transformations.switchMap(
                 currentCalendarDay, updatedCalendarDay ->
-                        toDoViewModel.getToDosByDueDate(formatDateForDB(selectedDate, updatedCalendarDay)));
-    }
-
-    public static String formatDateForDB(org.joda.time.LocalDate date, String dayNum){
-        if(dayNum.equals(" ")) return " ";
-        LocalDate moddedDate = null;
-        /*
-            If the user taps on calendar cell 31, on a month that has 31 days, but then switches
-            to another month that only has 30 days, this try/catch prevents Joda time from
-            attempting to convert this into a valid LocalDate, since a date such as 04-31-2022
-            does not exist.
-         */
-        try {
-            moddedDate = date.withDayOfMonth(Integer.parseInt(dayNum));
-        } catch (IllegalFieldValueException e) {
-            e.printStackTrace();
-        }
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
-        return (moddedDate != null)? dtf.print(moddedDate) : " ";
-    }
-
-    private String monthYearFromDate(org.joda.time.LocalDate selectedDate) {
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("MMMM yyyy");
-        return dtf.print(selectedDate);
-    }
-
-    private ArrayList<String> daysInMonthArray(org.joda.time.LocalDate selectedDate) {
-        ArrayList<String> daysInMonthArray = new ArrayList<>();
-        org.joda.time.YearMonth yearMonth = new YearMonth(
-                selectedDate.getYear(),
-                selectedDate.getMonthOfYear()
-        );
-
-        int daysInMonth = yearMonth
-                .toDateTime(null)
-                .dayOfMonth()
-                .getMaximumValue();
-
-        org.joda.time.LocalDate firstOfMonth = selectedDate.withDayOfMonth(1); // get first day of the month
-        int dayOfWeek = firstOfMonth.getDayOfWeek();
-
-        for (int i = 1; i < 42; i++){
-            if(i <= dayOfWeek || i > daysInMonth + dayOfWeek){
-                daysInMonthArray.add(" "); // we add a blank
-            }else{
-                daysInMonthArray.add(String.valueOf(i - dayOfWeek));
-            }
-        }
-        return daysInMonthArray;
-    }
-
-    private String monthFromDate(LocalDate selectedDate) {
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("MM");
-        return dtf.print(selectedDate); // minus because Joda time is not zero indexed
+                        toDoViewModel.getToDosByDueDate(AndromedaDate.formatDateForDB(selectedDate, updatedCalendarDay)));
     }
 
     private void setOnClickListeners() {

@@ -13,13 +13,9 @@
         <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/layout/fragment_to_do.xml" value="0.21510416666666668" />
         <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/layout/item_calendar_cell.xml" value="0.215625" />
         <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/layout/item_to_do.xml" value="0.5" />
+        <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/layout/new_note.xml" value="0.215625" />
         <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/menu/menu_options_add_edit_fragment.xml" value="0.215625" />
         <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/menu/navigation_bottom_main.xml" value="0.21510416666666668" />
-        <entry key="app/src/main/res/layout/fragment_add_edit_to_do.xml" value="0.4678442028985507" />
-        <entry key="app/src/main/res/layout/fragment_notes.xml" value="0.18697916666666667" />
-        <entry key="app/src/main/res/layout/item_notes.xml" value="0.1875" />
-        <entry key="app/src/main/res/layout/new_note.xml" value="0.4678442028985507" />
-        <entry key="app/src/main/res/menu/menu_options_add_edit_fragment.xml" value="0.4973958333333333" />
       </map>
     </option>
   </component>

@@ -10,13 +10,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputLayout;
 import edu.fsu.cs.andromeda.R;
 import edu.fsu.cs.andromeda.db.note.Note;
 import edu.fsu.cs.andromeda.db.note.NoteViewModel;
+import edu.fsu.cs.andromeda.ui.todo.AddEditToDoFragmentArgs;
+import edu.fsu.cs.andromeda.util.AndromedaDate;
 
 public class AddEditNoteFragment extends Fragment {
     private Note currentNote = null;
@@ -34,6 +39,8 @@ public class AddEditNoteFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        noteViewModel = new ViewModelProvider(this).get(NoteViewModel.class);
+        setHasOptionsMenu(true);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -41,6 +48,23 @@ public class AddEditNoteFragment extends Fragment {
         view = inflater.inflate(R.layout.new_note, container, false);
         return view;
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // define the views
+        noteTitle = view.findViewById(R.id.new_note_title);
+        noteBody = view.findViewById(R.id.note_Text);
+
+        currentNote =  AddEditNoteFragmentArgs.fromBundle(getArguments()).getEditNote();
+        if(currentNote != null) {
+            // populate the UI with existing data if we are editing a note
+            noteTitle.getEditText().setText(currentNote.getTitle());
+            noteBody.setText(currentNote.getBody());
+        }
+    }
+
     //use this instead of save button??
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
@@ -53,7 +77,8 @@ public class AddEditNoteFragment extends Fragment {
         if(item.getItemId() == R.id.btn_save)
         {
             createNote();
-            // TODO add navigation
+            Navigation.findNavController(view)
+                    .navigate(R.id.action_addEditNoteFragment_to_notesFragment);
             return true;
         }
         else
@@ -77,15 +102,17 @@ public class AddEditNoteFragment extends Fragment {
         if(currentNote == null)
         {
             currentNote = new Note(
-                    "title",
-                    "body",
-                    "2022-04-17 12:50:00"
+                    noteTitle.getEditText().getText().toString().trim(),
+                    noteBody.getText().toString().trim(),
+                    AndromedaDate.getTodaysDate()
             );
             int noteId = (int) noteViewModel.upsertNote(currentNote);
             currentNote.setNoteId(noteId);
         }
         else
         {
+            // TODO don't forget to update your current note's properties with whatever data the
+            //  user has changed in the UI before upserting it!
             noteViewModel.upsertNote(currentNote);
         }
     }
