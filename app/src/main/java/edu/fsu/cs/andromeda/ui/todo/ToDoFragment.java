@@ -10,6 +10,7 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.joda.time.LocalDate;
 import java.util.ArrayList;
@@ -59,36 +62,6 @@ public class ToDoFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
-//        toDoViewModel.upsertToDo(
-//                new ToDo("Pick up mulch for flower bed",
-//                        "",
-//                        "2022-05-01 17:30:00",
-//                        false)
-//        );
-//        toDoViewModel.upsertToDo(
-//                new ToDo("Stop by nursery for extra hydrangeas",
-//                        "",
-//                        "2022-05-01 18:00:00",
-//                        false)
-//        );
-//        toDoViewModel.upsertToDo(
-//                new ToDo("Call about referrals",
-//                        "",
-//                        "2022-05-01 09:30:00",
-//                        false)
-//        );
-//        toDoViewModel.upsertToDo(
-//                new ToDo("Update playlist",
-//                        "I have the best taste in music",
-//                        "2022-05-31 12:30:00",
-//                        false)
-//        );
-//        toDoViewModel.upsertToDo(
-//                new ToDo("Pick up birthday cake",
-//                        "Don't forget the party hats",
-//                        "2022-05-27 09:45:00",
-//                        false)
-//        );
     }
 
     @Override
@@ -172,6 +145,20 @@ public class ToDoFragment extends Fragment {
                 toDoAdapter.setToDosByDate(toDos);
             }
         });
+
+        // delete on swipe
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                toDoViewModel.deleteToDo(toDoAdapter.getToDoAtPosition(viewHolder.getAdapterPosition()));
+                Toast.makeText(getContext(), "To Do deleted", Toast.LENGTH_SHORT).show();
+            }
+        }).attachToRecyclerView(rvDayDetails);
     }
 
     private void updateToDoQuickView() {
