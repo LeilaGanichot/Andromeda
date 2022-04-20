@@ -65,6 +65,10 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
         return toDosByDate.size();
     }
 
+    public ToDo getToDoAtPosition(int position) {
+        return toDosByDate.get(position);
+    }
+
     public void setToDosByDate(List<ToDo> toDosByDate){
         this.toDosByDate = toDosByDate;
         notifyDataSetChanged();
