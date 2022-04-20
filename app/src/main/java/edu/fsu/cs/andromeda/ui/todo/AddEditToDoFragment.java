@@ -31,6 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import edu.fsu.cs.andromeda.R;
+import edu.fsu.cs.andromeda.db.reminder.Reminder;
+import edu.fsu.cs.andromeda.db.reminder.ReminderViewModel;
 import edu.fsu.cs.andromeda.db.todo.ToDo;
 import edu.fsu.cs.andromeda.db.todo.ToDoViewModel;
 import edu.fsu.cs.andromeda.util.AndromedaDate;
@@ -40,6 +42,7 @@ public class AddEditToDoFragment extends Fragment {
 
     // local vars
     private ToDoViewModel toDoViewModel;
+    private ReminderViewModel reminderViewModel;
     private ToDo currentToDo = null;
 
     public static final int TEN_MIN_AS_MS = 600000;
@@ -70,6 +73,7 @@ public class AddEditToDoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
+        reminderViewModel = new ViewModelProvider(this).get(ReminderViewModel.class);
     }
 
     @Nullable
@@ -149,9 +153,9 @@ public class AddEditToDoFragment extends Fragment {
         if(currentToDo == null) { // new to do
             // TODO get data to build a ToDo object from the UI
             currentToDo = new ToDo(
-                    "title",
-                    "body",
-                    "2022-04-17 12:50:00",
+                    tilToDoTitle.getEditText().getText().toString().trim(),
+                    tilToDoBody.getEditText().getText().toString().trim(),
+                    selectedDateTime,
                     false);
             int toDoId = (int) toDoViewModel.upsertToDo(currentToDo);
             // we need to do the below in order to have a complete To Do object, since id is a PK
@@ -169,20 +173,28 @@ public class AddEditToDoFragment extends Fragment {
         ReminderHelper reminderHelper = ReminderHelper.getInstance(getActivity());
 
         // automatic, mandatory reminder on due date
+        int reminderId = (int) reminderViewModel.upsertReminder(new Reminder(
+                currentToDo.getToDoId(),
+                dueDateInMs
+        ));
         reminderHelper.createSingleReminder(
                 dueDateInMs,
                 currentToDo.getTitle(),
                 currentToDo.getBody(),
-                currentToDo.getToDoId()
+                reminderId
         );
-        // create another reminder 10 minutes before its due, it's a sample
+        // create another reminder 10 minutes before its due, it's a test
         // TODO @cm these reminder times should be dynamically picked by the user (based upon
         //  the selected check boxes
+        reminderId = (int) reminderViewModel.upsertReminder(new Reminder(
+                currentToDo.getToDoId(),
+                dueDateInMs - TEN_MIN_AS_MS
+        ));
         reminderHelper.createSingleReminder(
                 dueDateInMs - TEN_MIN_AS_MS,
                 currentToDo.getTitle(),
                 currentToDo.getBody(),
-                currentToDo.getToDoId()
+                reminderId
         );
     }
 
