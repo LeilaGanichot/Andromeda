@@ -1,5 +1,9 @@
 package edu.fsu.cs.andromeda.ui.todo;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -25,10 +29,14 @@ import org.joda.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import edu.fsu.cs.andromeda.R;
+import edu.fsu.cs.andromeda.db.reminder.Reminder;
+import edu.fsu.cs.andromeda.db.reminder.ReminderViewModel;
 import edu.fsu.cs.andromeda.db.todo.ToDo;
 import edu.fsu.cs.andromeda.db.todo.ToDoViewModel;
 import edu.fsu.cs.andromeda.ui.todo.calendar.CalendarAdapter;
 import edu.fsu.cs.andromeda.util.AndromedaDate;
+import edu.fsu.cs.andromeda.util.reminder.AlertReceiver;
+import edu.fsu.cs.andromeda.util.reminder.ReminderHelper;
 
 public class ToDoFragment extends Fragment {
 
@@ -48,10 +56,15 @@ public class ToDoFragment extends Fragment {
 
     // Local vars
     private org.joda.time.LocalDate selectedDate;
-    // screen's dimensions
     private ToDoViewModel toDoViewModel;
+    private ReminderViewModel reminderViewModel;
     private MutableLiveData<String> currentCalendarDay = new MutableLiveData<>(" ");
     private LiveData<List<ToDo>> toDosByDate;
+    private ToDo currentToDo = null;
+
+    // reminders
+    private MutableLiveData<Integer> currentToDoId = new MutableLiveData<>(0);
+    private LiveData<List<Reminder>> remindersByToDo;
 
     public ToDoFragment() {
         // Required empty public constructor
@@ -62,6 +75,7 @@ public class ToDoFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
+        reminderViewModel = new ViewModelProvider(this).get(ReminderViewModel.class);
     }
 
     @Override
@@ -145,6 +159,21 @@ public class ToDoFragment extends Fragment {
                 toDoAdapter.setToDosByDate(toDos);
             }
         });
+        // reminders
+        remindersByToDo = Transformations.switchMap(
+                currentToDoId, updatedToDoId ->
+                        reminderViewModel.getAllRemindersByToDoFk(updatedToDoId)
+        );
+        remindersByToDo.observe(getViewLifecycleOwner(), new Observer<List<Reminder>>() {
+            @Override
+            public void onChanged(List<Reminder> reminders) {
+                if(currentToDo != null) {
+                    cancelReminders(currentToDo, reminders);
+                    toDoViewModel.deleteToDo(currentToDo); // delete here because this will cascade delete the associated reminders
+                    currentToDo = null;
+                }
+            }
+        });
 
         // delete on swipe
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -155,10 +184,32 @@ public class ToDoFragment extends Fragment {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                toDoViewModel.deleteToDo(toDoAdapter.getToDoAtPosition(viewHolder.getAdapterPosition()));
+                currentToDo = toDoAdapter.getToDoAtPosition(viewHolder.getAdapterPosition());
+                currentToDoId.postValue(currentToDo.getToDoId());
                 Toast.makeText(getContext(), "To Do deleted", Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(rvDayDetails);
+    }
+
+    private void cancelReminders(ToDo toDo, List<Reminder> reminders) {
+        Intent reminderIntent = new Intent(getContext(), AlertReceiver.class);
+        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent;
+        reminderIntent.putExtra(ReminderHelper.EXTRA_REMINDER_TITLE, toDo.getTitle());
+        reminderIntent.putExtra(ReminderHelper.EXTRA_REMINDER_BODY, toDo.getBody());
+
+        reminderIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+
+        for (Reminder reminder : reminders) {
+            reminderIntent.putExtra(ReminderHelper.EXTRA_REMINDER_ID, reminder.getReminderId());
+            pendingIntent = PendingIntent.getBroadcast(
+                    getContext(),
+                    reminder.getReminderId(),
+                    reminderIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+            );
+            alarmManager.cancel(pendingIntent);
+        }
     }
 
     private void updateToDoQuickView() {
