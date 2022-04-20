@@ -28,7 +28,7 @@ public class AddEditNoteFragment extends Fragment {
     private NoteViewModel noteViewModel;
     //widgets
     private View view;
-    private Button btnSave;
+    //private Button btnSave;
     private TextInputLayout noteTitle;
     private EditText noteBody;
 

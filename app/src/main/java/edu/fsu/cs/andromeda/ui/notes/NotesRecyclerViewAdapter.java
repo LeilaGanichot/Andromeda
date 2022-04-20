@@ -9,7 +9,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.fsu.cs.andromeda.R;
@@ -49,12 +53,41 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //String testNotes = notesData.get(position);
         Note currentNote = noteList.get(position);
-        holder.textView.setText(currentNote.getTitle()); // TODO set the rest of the views as necessary (are we displaying the body of the note & its creation date, similar to the ToDoAdapter maybe?)
+        holder.noteTitle.setText(currentNote.getTitle()); // TODO set the rest of the views as necessary (are we displaying the body of the note & its creation date, similar to the ToDoAdapter maybe?)
+        if(currentNote.getBody().isEmpty())
+        {
+            holder.noteBody.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.noteBody.setVisibility(View.VISIBLE);
+            holder.noteBody.setText(currentNote.getBody());
+        }
+        holder.noteDate.setText(formatDate(currentNote.getDateCreated()));
+    }
+
+    public static String formatDate(String dateStr)
+    {
+        DateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try{
+            date = (Date) parser.parse(dateStr);
+        } catch(ParseException e)
+        {
+            e.printStackTrace();
+        }
+        DateFormat formatter = new SimpleDateFormat("EEE MMM d, yyyy - HH:mm:ss");
+        assert date != null;
+        return formatter.format(date);
     }
 
     @Override
     public int getItemCount() {
         return noteList.size();
+    }
+    public Note getNote(int pos)
+    {
+        return noteList.get(pos);
     }
 
     public void setNoteList(List<Note> noteList) {
@@ -64,11 +97,16 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<NotesRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView textView;
+        private TextView noteTitle;
+        private TextView noteBody;
+        private TextView noteDate;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            textView = itemView.findViewById(R.id.notesRVItem);
+            noteTitle = itemView.findViewById(R.id.notesRVtitle);
+            noteBody = itemView.findViewById(R.id.notesRVbody);
+            noteDate = itemView.findViewById(R.id.notesRVdate);
 
 
             itemView.setOnClickListener(new View.OnClickListener() {

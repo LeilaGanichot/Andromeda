@@ -1,18 +1,24 @@
 package edu.fsu.cs.andromeda.ui.notes;
 
+import android.app.ListActivity;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -87,7 +93,7 @@ public class NotesFragment extends Fragment {
 
         noteViewModel = new ViewModelProvider(this).get(NoteViewModel.class);
         // TODO remove the below: just a way to insert dummy note data into the db
-        noteViewModel.upsertNote(new Note(
+     /*   noteViewModel.upsertNote(new Note(
                 "Note title 1",
                 "Note body 1",
                 AndromedaDate.getTodaysDate()
@@ -106,8 +112,10 @@ public class NotesFragment extends Fragment {
                 "Note title 4",
                 "Note body 4",
                 AndromedaDate.getTodaysDate()
-        ));
+        ));*/
     }
+
+
 
 
 
@@ -119,9 +127,9 @@ public class NotesFragment extends Fragment {
 
         fabAddNewNote = view.findViewById(R.id.fab_add_new_note);
 
-        ArrayList<String> noteItems = new ArrayList<>();
-        noteItems.add("Note 1");
-        noteItems.add("Note 2");
+        //ArrayList<String> noteItems = new ArrayList<>();
+        //noteItems.add("Note 1");
+        //noteItems.add("Note 2");
 
         RecyclerView rView = view.findViewById(R.id.notesRV);
         rView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -153,7 +161,27 @@ public class NotesFragment extends Fragment {
             public void onChanged(List<Note> notes) {
                 adapter.setNoteList(notes);
             }
+
         });
+        //Swipe to delete
+        //Reference: https://stackoverflow.com/questions/33985719/android-swipe-to-delete-recyclerview
+        ItemTouchHelper.SimpleCallback itemTouch = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT)
+        {
+            public boolean onMove(RecyclerView rview, RecyclerView.ViewHolder holder, RecyclerView.ViewHolder target)
+            {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                noteViewModel.deleteNote(adapter.getNote(viewHolder.getAdapterPosition()));
+                Toast.makeText(getActivity(),"Note Deleted", Toast.LENGTH_SHORT).show();
+            }
+
+        };
+        ItemTouchHelper touchHelper = new ItemTouchHelper(itemTouch);
+        touchHelper.attachToRecyclerView(rView);
 
         return view;
 
@@ -176,6 +204,8 @@ public class NotesFragment extends Fragment {
             }
         });
     }
+    
+
 
 
 }
