@@ -16,6 +16,15 @@
         <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/layout/new_note.xml" value="0.215625" />
         <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/menu/menu_options_add_edit_fragment.xml" value="0.215625" />
         <entry key="..\:/Users/Cristian/AndroidStudioProjects/Andromeda/app/src/main/res/menu/navigation_bottom_main.xml" value="0.21510416666666668" />
+        <entry key="app/src/main/res/drawable/delete.xml" value="0.125" />
+        <entry key="app/src/main/res/drawable/ic.xml" value="0.125" />
+        <entry key="app/src/main/res/drawable/ic_delete.xml" value="0.125" />
+        <entry key="app/src/main/res/drawable/ic_floppy_disk.xml" value="0.125" />
+        <entry key="app/src/main/res/drawable/ic_moon.xml" value="0.125" />
+        <entry key="app/src/main/res/layout/fragment_add_edit_to_do.xml" value="0.2463768115942029" />
+        <entry key="app/src/main/res/layout/item_notes.xml" value="0.44842105263157894" />
+        <entry key="app/src/main/res/layout/item_to_do.xml" value="0.4678442028985507" />
+        <entry key="app/src/main/res/layout/new_note.xml" value="0.2463768115942029" />
       </map>
     </option>
   </component>
