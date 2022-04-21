@@ -108,16 +108,22 @@ public class AddEditNoteFragment extends Fragment {
                     noteBody.getText().toString().trim(),
                     AndromedaDate.getTodaysDate()
             );
-            int noteId = (int) noteViewModel.upsertNote(currentNote);
-            currentNote.setNoteId(noteId);
+            noteViewModel.upsertNote(currentNote);
+
         }
         else
         {
             // TODO don't forget to update your current note's properties with whatever data the
             //  user has changed in the UI before upserting it!
-            currentNote.setTitle(noteTitle.getEditText().getText().toString().trim());
-            currentNote.setBody(noteBody.getText().toString().trim());
-            noteViewModel.upsertNote(currentNote);
+            noteViewModel.deleteNote(currentNote);
+            currentNote = new Note(
+                    noteTitle.getEditText().getText().toString().trim(),
+                    noteBody.getText().toString().trim(),
+                    AndromedaDate.getTodaysDate()
+            );
+            int noteId = (int) noteViewModel.upsertNote(currentNote);
+            currentNote.setNoteId(noteId);
+
         }
     }
 }
