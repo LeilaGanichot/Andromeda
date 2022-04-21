@@ -116,6 +116,7 @@ public class AddEditNoteFragment extends Fragment {
         }
         else
         {
+            //Reference: https://gist.github.com/codinginflow/e39be47e4f0dfd376337f20f34629cb4
             // TODO don't forget to update your current note's properties with whatever data the
             //  user has changed in the UI before upserting it!
             noteViewModel.deleteNote(currentNote);
