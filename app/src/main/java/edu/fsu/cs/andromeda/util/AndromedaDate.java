@@ -92,6 +92,20 @@ public class AndromedaDate {
         return formatter.format(date);
     }
 
+    public static String formatDateTimeFromDBFormatToPretty(String dateTimeString){
+        @SuppressLint("SimpleDateFormat") DateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = (Date) parser.parse(dateTimeString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        @SuppressLint("SimpleDateFormat") DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss");
+        assert date != null;
+        return formatter.format(date);
+    }
+
     public static Calendar convertToDateTime(String dateTime) {
         Calendar convertedDateTime = Calendar.getInstance();
 

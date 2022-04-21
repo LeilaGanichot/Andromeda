@@ -24,4 +24,7 @@ public interface ReminderDao {
 
     @Query("SELECT * FROM tableReminder WHERE toDoFk = :toDoFk ORDER BY reminderTimeInMs ASC")
     LiveData<List<Reminder>> getAllRemindersByToDoFk(int toDoFk);
+
+    @Query("SELECT * FROM tableReminder WHERE toDoFk = :toDoFk ORDER BY reminderTimeInMs ASC")
+    List<Reminder> getAllRemindersByToDoFkAsync(int toDoFk);
 }

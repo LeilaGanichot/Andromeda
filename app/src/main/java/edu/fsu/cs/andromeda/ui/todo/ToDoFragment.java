@@ -61,6 +61,7 @@ public class ToDoFragment extends Fragment {
     private MutableLiveData<String> currentCalendarDay = new MutableLiveData<>(" ");
     private LiveData<List<ToDo>> toDosByDate;
     private ToDo currentToDo = null;
+    private ReminderHelper reminderHelper;
 
     // reminders
     private MutableLiveData<Integer> currentToDoId = new MutableLiveData<>(0);
@@ -79,11 +80,18 @@ public class ToDoFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ReminderHelper.onDestroy();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_to_do, container, false);
 
+        reminderHelper = ReminderHelper.getInstance(getActivity());
         selectedDate = LocalDate.now();
         defineWidgets(view);
         setCalendarViews();
@@ -168,7 +176,7 @@ public class ToDoFragment extends Fragment {
             @Override
             public void onChanged(List<Reminder> reminders) {
                 if(currentToDo != null) {
-                    cancelReminders(currentToDo, reminders);
+                    reminderHelper.cancelReminders(getContext(), currentToDo, reminders);
                     toDoViewModel.deleteToDo(currentToDo); // delete here because this will cascade delete the associated reminders
                     currentToDo = null;
                 }
@@ -189,27 +197,6 @@ public class ToDoFragment extends Fragment {
                 Toast.makeText(getContext(), "To Do deleted", Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(rvDayDetails);
-    }
-
-    private void cancelReminders(ToDo toDo, List<Reminder> reminders) {
-        Intent reminderIntent = new Intent(getContext(), AlertReceiver.class);
-        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pendingIntent;
-        reminderIntent.putExtra(ReminderHelper.EXTRA_REMINDER_TITLE, toDo.getTitle());
-        reminderIntent.putExtra(ReminderHelper.EXTRA_REMINDER_BODY, toDo.getBody());
-
-        reminderIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-
-        for (Reminder reminder : reminders) {
-            reminderIntent.putExtra(ReminderHelper.EXTRA_REMINDER_ID, reminder.getReminderId());
-            pendingIntent = PendingIntent.getBroadcast(
-                    getContext(),
-                    reminder.getReminderId(),
-                    reminderIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT
-            );
-            alarmManager.cancel(pendingIntent);
-        }
     }
 
     private void updateToDoQuickView() {

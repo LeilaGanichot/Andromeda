@@ -1,6 +1,7 @@
 package edu.fsu.cs.andromeda.db.reminder;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
@@ -17,6 +18,7 @@ public class ReminderRepository {
 
     private LiveData<List<Reminder>> allReminders;
     private LiveData<List<Reminder>> allRemindersByToDoFk;
+    private List<Reminder> allRemindersByToDoFkAsync;
 
     public ReminderRepository(Application application) {
         this.application = application;
@@ -24,6 +26,11 @@ public class ReminderRepository {
         AndromedaDB andromedaDB = AndromedaDB.getInstance(application);
         reminderDao = andromedaDB.reminderDao();
         allReminders = reminderDao.getAllReminders();
+    }
+
+    public ReminderRepository(Context context) {
+        AndromedaDB andromedaDB = AndromedaDB.getInstance(context);
+        reminderDao = andromedaDB.reminderDao();
     }
 
     public LiveData<List<Reminder>> getAllReminders() {
@@ -48,7 +55,32 @@ public class ReminderRepository {
         new DeleteReminderAsync(reminderDao).execute(reminder);
     }
 
+    public List<Reminder> getAllRemindersByToDoFkAsync(int toDoFkId) {
+        new GetRemindersByFkAsync(reminderDao).execute(toDoFkId);
+        return allRemindersByToDoFkAsync;
+    }
+
     // ASYNC TASKS
+    public class GetRemindersByFkAsync extends AsyncTask<Integer, Void, List<Reminder>> {
+
+        private ReminderDao reminderDao;
+
+        public GetRemindersByFkAsync(ReminderDao reminderDao) {
+            this.reminderDao = reminderDao;
+        }
+
+        @Override
+        protected List<Reminder> doInBackground(Integer... toDoFkIds) {
+            return reminderDao.getAllRemindersByToDoFkAsync(toDoFkIds[0]);
+        }
+
+        @Override
+        protected void onPostExecute(List<Reminder> reminders) {
+            super.onPostExecute(reminders);
+            allRemindersByToDoFkAsync = reminders;
+        }
+    }
+
     public class UpsertReminderAsync extends AsyncTask<Reminder, Void, Long> {
 
         private ReminderDao reminderDao;
