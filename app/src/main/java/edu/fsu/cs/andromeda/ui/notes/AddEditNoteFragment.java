@@ -12,6 +12,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -60,6 +61,7 @@ public class AddEditNoteFragment extends Fragment {
         currentNote =  AddEditNoteFragmentArgs.fromBundle(getArguments()).getEditNote();
         if(currentNote != null) {
             // populate the UI with existing data if we are editing a note
+            ((AppCompatActivity) getContext()).getSupportActionBar().setTitle("Edit note");
             noteTitle.getEditText().setText(currentNote.getTitle());
             noteBody.setText(currentNote.getBody());
         }
@@ -113,6 +115,8 @@ public class AddEditNoteFragment extends Fragment {
         {
             // TODO don't forget to update your current note's properties with whatever data the
             //  user has changed in the UI before upserting it!
+            currentNote.setTitle(noteTitle.getEditText().getText().toString().trim());
+            currentNote.setBody(noteBody.getText().toString().trim());
             noteViewModel.upsertNote(currentNote);
         }
     }

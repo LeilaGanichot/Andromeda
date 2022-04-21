@@ -15,6 +15,7 @@ import android.widget.CheckBox;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -29,6 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import edu.fsu.cs.andromeda.R;
 import edu.fsu.cs.andromeda.db.reminder.Reminder;
@@ -95,7 +97,17 @@ public class AddEditToDoFragment extends Fragment {
         currentToDo = AddEditToDoFragmentArgs.fromBundle(getArguments()).getEditToDo();
         if(currentToDo != null) { // means the user is editing a to do
             // TODO @cm use the passed object's properties to populate the UI with its existing data
+            ((AppCompatActivity) getContext()).getSupportActionBar().setTitle("Edit to do");
+            tilToDoTitle.getEditText().setText(currentToDo.getTitle());
+            tilToDoBody.getEditText().setText(currentToDo.getBody());
+            btnSetToDoDueDate.setText("Due on: " + AndromedaDate.formatDateTimeFromDBFormatToPretty(currentToDo.getDueDate()));
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ReminderHelper.onDestroy();
     }
 
     @Override
@@ -177,10 +189,13 @@ public class AddEditToDoFragment extends Fragment {
                 currentToDo.getToDoId(),
                 dueDateInMs
         ));
+        // TODO @cm refactor the below to use createMultiReminder instead and pass a list of
+        //  reminders along with the to do
         reminderHelper.createSingleReminder(
                 dueDateInMs,
                 currentToDo.getTitle(),
                 currentToDo.getBody(),
+                currentToDo.getToDoId(),
                 reminderId
         );
         // create another reminder 10 minutes before its due, it's a test
@@ -194,6 +209,7 @@ public class AddEditToDoFragment extends Fragment {
                 dueDateInMs - TEN_MIN_AS_MS,
                 currentToDo.getTitle(),
                 currentToDo.getBody(),
+                currentToDo.getToDoId(),
                 reminderId
         );
     }
