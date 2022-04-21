@@ -43,6 +43,8 @@ public class NoteRepository {
         new DeleteNoteAsync(noteDao).execute(note);
     }
 
+
+
     public LiveData<List<Note>> getAllNotesByDateCreated() {
         return allNotesByDateCreated;
     }
@@ -51,6 +53,8 @@ public class NoteRepository {
         searchNotesResults = noteDao.searchNotes(searchQuery);
         return searchNotesResults;
     }
+
+
 
     // Async task operations
     public class UpsertNoteAsync extends AsyncTask<Note, Void, Long> {
@@ -83,4 +87,8 @@ public class NoteRepository {
             return null;
         }
     }
+
+
+
+
 }

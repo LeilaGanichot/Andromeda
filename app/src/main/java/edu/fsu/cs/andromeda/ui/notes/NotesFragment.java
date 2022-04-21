@@ -202,6 +202,7 @@ public class NotesFragment extends Fragment {
                         NotesFragmentDirections.actionNotesFragmentToAddEditNoteFragment(note);
                 Navigation.findNavController(view).navigate(action);
             }
+
         });
     }
     

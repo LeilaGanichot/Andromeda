@@ -43,9 +43,13 @@ public class AddEditNoteFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         view = inflater.inflate(R.layout.new_note, container, false);
+        defineViews();
+        defineObservers();
         return view;
     }
 
@@ -62,6 +66,7 @@ public class AddEditNoteFragment extends Fragment {
             // populate the UI with existing data if we are editing a note
             noteTitle.getEditText().setText(currentNote.getTitle());
             noteBody.setText(currentNote.getBody());
+            AndromedaDate.getTodaysDate();
         }
     }
 
@@ -106,14 +111,24 @@ public class AddEditNoteFragment extends Fragment {
                     noteBody.getText().toString().trim(),
                     AndromedaDate.getTodaysDate()
             );
-            int noteId = (int) noteViewModel.upsertNote(currentNote);
-            currentNote.setNoteId(noteId);
+
+            noteViewModel.upsertNote(currentNote);
         }
         else
         {
             // TODO don't forget to update your current note's properties with whatever data the
             //  user has changed in the UI before upserting it!
-            noteViewModel.upsertNote(currentNote);
+            noteViewModel.deleteNote(currentNote);
+
+            currentNote = new Note(
+                    noteTitle.getEditText().getText().toString().trim(),
+                    noteBody.getText().toString().trim(),
+                    AndromedaDate.getTodaysDate()
+            );
+            int noteId = (int) noteViewModel.upsertNote(currentNote);
+              currentNote.setNoteId(noteId);
+
+
         }
     }
 }

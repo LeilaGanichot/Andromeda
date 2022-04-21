@@ -30,6 +30,8 @@ public class NoteViewModel extends AndroidViewModel {
         noteRepository.deleteNote(note);
     }
 
+
+
     public LiveData<List<Note>> getAllNotesByDateCreated() {
         return allNotesByDateCreated;
     }
